@@ -1,305 +1,187 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Досье: Даша</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{
-            background:#000;
-            color:#00ff88;
-            font-family:Consolas,monospace;
-            overflow:hidden;
-            height:100dvh;
-            touch-action: manipulation;
-        }
-        canvas{position:fixed;inset:0;z-index:-2}
-        
-        .screen{
-            height:100dvh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            padding:20px;
-        }
-        .card{
-            width:100%;
-            max-width:520px;
-            background:rgba(0,0,0,.9);
-            border:2px solid #00ff88;
-            padding:35px 25px;
-            border-radius:20px;
-            box-shadow:0 0 30px #00ff88;
-            text-align:center;
-        }
-        button{
-            padding:18px 32px;
-            font-size:19px;
-            border:none;
-            border-radius:12px;
-            cursor:pointer;
-            margin:12px 8px;
-            font-weight:bold;
-            min-width:160px;
-            touch-action: manipulation;
-        }
-        .green{background:#00ff88;color:#000}
-        .red{background:#ff4444;color:#fff}
-        
-        #terminal div{margin:10px 0; text-align:left}
-        .type{border-right:2px solid #00ff88;white-space:nowrap;overflow:hidden}
-        
-        #dossier img{
-            width:100%;
-            max-width:240px;
-            border:2px solid #00ff88;
-            border-radius:16px;
-            box-shadow:0 0 25px #00ff88;
-        }
-        
-        .reject{position:absolute}
-        
-        #access{
-            position:fixed;
-            inset:0;
-            background:black;
-            color:#00ff88;
-            display:none;
-            justify-content:center;
-            align-items:center;
-            font-size:52px;
-            font-weight:bold;
-            text-shadow:0 0 30px #00ff88;
-            animation:flash .4s infinite;
-            z-index:1000;
-        }
-        @keyframes flash{50%{opacity:.4}}
-        
-        #finalScene{
-            position:fixed;
-            inset:0;
-            display:none;
-            justify-content:center;
-            align-items:center;
-        }
-        .bg{
-            position:absolute;
-            inset:0;
-            background-size:cover;
-            background-position:center;
-            transition:opacity 2s;
-        }
-        #photoBg{opacity:0}
-        .overlay{position:absolute;inset:0;background:rgba(0,0,0,.45)}
-        .finalBox{
-            position:relative;
-            color:white;
-            background:rgba(0,0,0,.65);
-            padding:40px 25px;
-            border-radius:24px;
-            text-align:center;
-            max-width:460px;
-            margin:20px;
-        }
-        .heart{
-            position:fixed;
-            top:-50px;
-            font-size:32px;
-            animation:fall linear forwards;
-            z-index:999;
-        }
-        @keyframes fall{to{transform:translateY(120dvh);opacity:0}}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Досье: Даша</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#00ff88;font-family:Consolas,monospace;overflow:hidden}
+canvas{position:fixed;inset:0;z-index:-2}
+.hidden{display:none!important}
+.screen{height:100vh;display:flex;justify-content:center;align-items:center}
+.card{width:90%;max-width:950px;background:rgba(0,0,0,.85);border:2px solid #00ff88;padding:30px;box-shadow:0 0 25px #00ff88}
+.center{text-align:center}
+button{padding:14px 28px;font-size:18px;border:none;border-radius:10px;cursor:pointer;margin:10px;font-weight:bold}
+.green{background:#00ff88}
+.red{background:#ff4444;color:#fff}
+#terminal div{margin:8px 0}
+.type{border-right:2px solid #00ff88;white-space:nowrap;overflow:hidden}
+#dossier{margin-top:20px;text-align:center}
+#dossier img{width:220px;border:2px solid #00ff88;border-radius:12px;box-shadow:0 0 20px #00ff88}
+.reject{position:absolute}
+.scan{animation:scan 2s infinite}
+@keyframes scan{50%{filter:brightness(1.5)}}
+.heart{position:fixed;top:-50px;font-size:28px;animation:fall linear forwards;z-index:999}
+@keyframes fall{to{transform:translateY(120vh);opacity:0}}
+#access{
+position:fixed;inset:0;background:black;color:#00ff88;
+display:none;justify-content:center;align-items:center;
+font-size:70px;font-weight:bold;text-shadow:0 0 30px #00ff88;
+animation:flash .3s infinite;
+z-index:1000;
+}
+@keyframes flash{50%{opacity:.3}}
+#finalScene{position:fixed;inset:0;display:none;justify-content:center;align-items:center}
+.bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity 2s}
+#sunsetBg{background-image:url('images/sunset.jpg')}
+#photoBg{background-image:url('images/together.jpg');opacity:0}
+.overlay{position:absolute;inset:0;background:rgba(0,0,0,.4)}
+.finalBox{position:relative;color:white;background:rgba(0,0,0,.55);padding:40px;border-radius:20px;text-align:center}
+#secretMessage{opacity:0;transition:2s}
+</style>
 </head>
 <body>
 
 <canvas id="matrix"></canvas>
 
+<audio id="beep">
+<source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg">
+</audio>
+
 <div id="access">ACCESS GRANTED</div>
 
 <div class="screen" id="startScreen">
-    <div class="card">
-        <h1>🔒 СЕКРЕТНЫЙ ТЕРМИНАЛ</h1><br>
-        <p>Обнаружен зашифрованный файл...</p><br><br>
-        <button id="hack" class="green">ВЗЛОМАТЬ СИСТЕМУ</button>
-        <button id="run" class="red">НЕ УЗНАВАТЬ ТАЙНЫЕ ПЛАНЫ</button>
-    </div>
+<div class="card center">
+<h1>🔒 СЕКРЕТНЫЙ ТЕРМИНАЛ</h1><br>
+<p>Обнаружен зашифрованный файл.</p><br>
+<button id="hack" class="green">ВЗЛОМАТЬ СИСТЕМУ</button>
+<button id="run" class="red">НЕ УЗНАВАТЬ ТАЙНЫЕ ПЛАНЫ</button>
+</div>
 </div>
 
 <div class="screen hidden" id="terminalScreen">
-    <div class="card">
-        <div id="terminal"></div>
+<div class="card">
+<div id="terminal"></div>
 
-        <div id="dossier" class="hidden">
-            <h2>ДОСЬЕ ОБНАРУЖЕНО</h2><br>
-            <img src="images/dasha.jpg" alt="Даша">
-            <p style="margin-top:15px">Объект: Даша</p>
-            <p>Статус: Чрезвычайно привлекательна ❤️</p>
-        </div>
+<div id="dossier" class="hidden">
+<h2>ДОСЬЕ ОБНАРУЖЕНО</h2><br>
+<img src="images/dasha.jpg" class="scan">
+<p style="margin-top:10px">Объект: Даша</p>
+<p>Статус: Чрезвычайно привлекательна</p>
+</div>
 
-        <div id="proposal" class="hidden" style="margin-top:25px">
-            <h2>ПРИНЯТЬ СЕКРЕТНЫЙ ЗАПРОС?</h2><br>
-            <button id="yes" class="green">ПРИНЯТЬ ❤️</button>
-            <button id="no" class="red reject">ОТКЛОНИТЬ ❌</button>
-        </div>
-    </div>
+<div id="proposal" class="hidden center" style="margin-top:20px">
+<h2>ПРИНЯТЬ СЕКРЕТНЫЙ ЗАПРОС?</h2><br>
+<button id="yes" class="green">ПРИНЯТЬ ❤️</button>
+<button id="no" class="red reject">ОТКЛОНИТЬ ❌</button>
+</div>
+</div>
 </div>
 
 <div id="finalScene">
-    <div id="sunsetBg" class="bg" style="background-image:url('images/sunset.jpg')"></div>
-    <div id="photoBg" class="bg" style="background-image:url('images/together.jpg')"></div>
-    <div class="overlay"></div>
-    <div class="finalBox">
-        <h1>✔ ЗАПРОС ПРИНЯТ</h1><br>
-        <p>Суббота • После книжной ярмарки</p><br>
-        <p>Главная цель: провести хороший вечер вместе ❤️</p>
-        <div id="secretMessage" style="opacity:0;transition:2s">
-            <br><h2>Иногда самые интересные истории начинаются с одного приглашения.</h2>
-        </div>
-    </div>
+<div id="sunsetBg" class="bg"></div>
+<div id="photoBg" class="bg"></div>
+<div class="overlay"></div>
+<div class="finalBox">
+<h1>✔ ЗАПРОС ПРИНЯТ</h1><br>
+<p>Суббота • После книжной ярмарки</p><br>
+<p>Главная цель: провести хороший вечер вместе ❤️</p>
+<div id="secretMessage">
+<br><h2>Иногда самые интересные истории начинаются с одного приглашения.</h2>
+</div>
+</div>
 </div>
 
 <script>
-    // Matrix rain
-    const c = document.getElementById('matrix');
-    const x = c.getContext('2d');
-    
-    function resizeCanvas() {
-        c.width = window.innerWidth;
-        c.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+const c=document.getElementById('matrix'),x=c.getContext('2d');
+c.width=innerWidth;c.height=innerHeight;
+let l='01АБВГДЕЖЗИЙКЛМНО';let f=14,col=c.width/f,d=[];
+for(let i=0;i<col;i++)d[i]=1;
+setInterval(()=>{
+x.fillStyle='rgba(0,0,0,.05)';x.fillRect(0,0,c.width,c.height);
+x.fillStyle='#00ff88';x.font=f+'px monospace';
+for(let i=0;i<d.length;i++){let t=l[Math.floor(Math.random()*l.length)];
+x.fillText(t,i*f,d[i]*f); if(d[i]*f>c.height&&Math.random()>.975)d[i]=0; d[i]++;}
+},33);
 
-    let chars = '01АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ';
-    let fontSize = 14;
-    let columns = c.width / fontSize;
-    let drops = [];
+let tries=0;
+run.onmouseover=()=>{
+tries++;
+run.innerText=['ЛЮБОПЫТСТВО НЕИЗБЕЖНО','СОПРОТИВЛЕНИЕ БЕСПОЛЕЗНО','ПОЙМАЙ МЕНЯ 😄'][Math.min(tries-1,2)];
+run.style.position='absolute';
+run.style.left=Math.random()*(innerWidth-250)+'px';
+run.style.top=Math.random()*(innerHeight-100)+'px';
+};
 
-    for (let i = 0; i < columns; i++) drops[i] = 1;
+function typeLine(text, delay){
+setTimeout(()=>{
+let div=document.createElement('div');
+terminal.appendChild(div);
+let i=0;
+let sound=setInterval(()=>{ try{beep.play()}catch(e){} },120);
+let inter=setInterval(()=>{
+div.textContent=text.slice(0,i++);
+if(i>text.length){clearInterval(inter);clearInterval(sound);}
+},35);
+},delay);
+}
 
-    setInterval(() => {
-        x.fillStyle = 'rgba(0,0,0,0.07)';
-        x.fillRect(0, 0, c.width, c.height);
-        x.fillStyle = '#00ff88';
-        x.font = fontSize + 'px monospace';
+hack.onclick=()=>{
+startScreen.classList.add('hidden');
+terminalScreen.classList.remove('hidden');
 
-        for (let i = 0; i < drops.length; i++) {
-            const text = chars[Math.floor(Math.random() * chars.length)];
-            x.fillText(text, i * fontSize, drops[i] * fontSize);
-            
-            if (drops[i] * fontSize > c.height && Math.random() > 0.975) {
-                drops[i] = 0;
-            }
-            drops[i]++;
-        }
-    }, 35);
+const lines=[
+'> Подключение...',
+'> Получение данных...',
+'> Поиск объекта...',
+'> Обнаружен объект: Даша',
+'> Анализ характера...',
+'> Совместимость: 99.8%',
+'> Поиск фотографий...',
+'> ДОСЬЕ НАЙДЕНО'
+];
 
-    // Variables
-    const startScreen = document.getElementById('startScreen');
-    const terminalScreen = document.getElementById('terminalScreen');
-    const terminal = document.getElementById('terminal');
-    const dossier = document.getElementById('dossier');
-    const proposal = document.getElementById('proposal');
-    const yesBtn = document.getElementById('yes');
-    const noBtn = document.getElementById('no');
-    const access = document.getElementById('access');
-    const finalScene = document.getElementById('finalScene');
-    const sunsetBg = document.getElementById('sunsetBg');
-    const photoBg = document.getElementById('photoBg');
-    const secretMessage = document.getElementById('secretMessage');
+lines.forEach((l,i)=>typeLine(l,i*1800));
 
-    // Make "run" button run away on mobile too
-    let tries = 0;
-    const runBtn = document.getElementById('run');
-    
-    function moveButton(btn) {
-        tries++;
-        if (tries > 3) return;
-        
-        btn.style.position = 'absolute';
-        btn.style.left = Math.random() * (window.innerWidth - 180) + 'px';
-        btn.style.top = Math.random() * (window.innerHeight - 120) + 'px';
-        
-        if (tries === 1) runBtn.innerText = 'ЛЮБОПЫТСТВО НЕИЗБЕЖНО';
-        if (tries === 2) runBtn.innerText = 'СОПРОТИВЛЕНИЕ БЕСПОЛЕЗНО';
-        if (tries === 3) runBtn.innerText = 'ПОЙМАЙ МЕНЯ 😄';
-    }
+setTimeout(()=>dossier.classList.remove('hidden'),15000);
+setTimeout(()=>proposal.classList.remove('hidden'),17000);
+};
 
-    runBtn.addEventListener('click', () => moveButton(runBtn));
-    runBtn.addEventListener('touchstart', () => moveButton(runBtn));
+no.onmouseover=()=>{
+no.style.left=Math.random()*(innerWidth-250)+'px';
+no.style.top=Math.random()*(innerHeight-100)+'px';
+};
 
-    noBtn.addEventListener('click', () => moveButton(noBtn));
-    noBtn.addEventListener('touchstart', () => moveButton(noBtn));
+yes.onclick=()=>{
+for(let i=0;i<120;i++){
+setTimeout(()=>{
+let h=document.createElement('div');
+h.className='heart';
+h.innerHTML='❤️';
+h.style.left=Math.random()*100+'vw';
+h.style.animationDuration=(Math.random()*3+2)+'s';
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),5000);
+},i*60);
+}
 
-    // Typing effect
-    function typeLine(text, delay) {
-        setTimeout(() => {
-            const div = document.createElement('div');
-            terminal.appendChild(div);
-            let i = 0;
-            const interval = setInterval(() => {
-                div.textContent = text.slice(0, i++);
-                if (i > text.length) clearInterval(interval);
-            }, 40);
-        }, delay);
-    }
+access.style.display='flex';
 
-    // Hack button
-    document.getElementById('hack').addEventListener('click', () => {
-        startScreen.classList.add('hidden');
-        terminalScreen.classList.remove('hidden');
+setTimeout(()=>{
+access.style.display='none';
+finalScene.style.display='flex';
+},2500);
 
-        const lines = [
-            '> Подключение...',
-            '> Получение данных...',
-            '> Поиск объекта...',
-            '> Обнаружен объект: Даша',
-            '> Анализ характера...',
-            '> Совместимость: 99.8%',
-            '> Поиск фотографий...',
-            '> ДОСЬЕ НАЙДЕНО'
-        ];
+setTimeout(()=>{
+sunsetBg.style.opacity='0';
+photoBg.style.opacity='1';
+},6500);
 
-        lines.forEach((line, i) => typeLine(line, i * 1400));
-
-        setTimeout(() => dossier.classList.remove('hidden'), 13500);
-        setTimeout(() => proposal.classList.remove('hidden'), 15500);
-    });
-
-    // Yes button - final scene
-    yesBtn.addEventListener('click', () => {
-        for (let i = 0; i < 150; i++) {
-            setTimeout(() => {
-                const heart = document.createElement('div');
-                heart.className = 'heart';
-                heart.innerHTML = '❤️';
-                heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.animationDuration = (Math.random() * 3 + 2.5) + 's';
-                document.body.appendChild(heart);
-                setTimeout(() => heart.remove(), 6000);
-            }, i * 45);
-        }
-
-        access.style.display = 'flex';
-
-        setTimeout(() => {
-            access.style.display = 'none';
-            finalScene.style.display = 'flex';
-        }, 2200);
-
-        setTimeout(() => {
-            sunsetBg.style.opacity = '0';
-            photoBg.style.opacity = '1';
-        }, 5800);
-
-        setTimeout(() => {
-            secretMessage.style.opacity = '1';
-        }, 7800);
-    });
+setTimeout(()=>{
+secretMessage.style.opacity='1';
+},8500);
+};
 </script>
 </body>
 </html>
